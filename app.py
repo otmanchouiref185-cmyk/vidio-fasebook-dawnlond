@@ -3,7 +3,7 @@ import yt_dlp
 
 app = Flask(__name__)
 
-# دالة السيرفر الموثوقة والسريعة لجلب الفيديو
+# دالة السيرفر الموثوقة لجلب الفيديو
 def get_facebook_video_url(fb_url):
     ydl_opts = {
         'format': 'best', 
@@ -27,7 +27,15 @@ def index():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>VRTX | Facebook Video Downloader</title>
+        
+        <title>VRTX | تحميل فيديوهات فيسبوك برابط مباشر وبأعلى جودة</title>
+        <meta name="description" content="أفضل أداة مجانية وسريعة لتنزيل فيديوهات الفيسبوك بجودة عالية. فقط ضع رابط الفيديو وحمل مباشرة بدون برامج.">
+        <meta name="keywords" content="تنزيل فيديوهات فيسبوك, تحميل من الفيسبوك, facebook downloader, download fb video, تحميل فيديوهات fb, تنزيل فيديو فيسبوك">
+        <meta name="author" content="Otman | VRTX">
+        <meta name="robots" content="index, follow">
+        
+        <meta name="google-site-verification" content="47uiqRAN7VFxZEC8DheNAakZcyaPL-rIkUTnFUMnM-s" />
+
         <style>
             :root {
                 --bg-color: #0f0c1b;
@@ -35,7 +43,7 @@ def index():
                 --primary: #8a2be2;
                 --accent: #bb86fc;
                 --success: #00e676;
-                --text-muted: #8a2be2; /* رجعنا اللون الأساسي الخافت هو البنفسجي الماركة ديالك */
+                --text-muted: #8a2be2;
             }
             body { 
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -47,7 +55,6 @@ def index():
                 position: relative;
             }
             
-            /* الحاوية ثابتة ف أعلى اليمين دائماً وبلا تغيير ف الاتجاه */
             .lang-container {
                 position: absolute;
                 top: 20px;
@@ -55,14 +62,14 @@ def index():
                 display: flex;
                 align-items: center;
                 z-index: 100;
-                direction: ltr !important; /* إجبار الحاوية تبقى ديما بنفس الترتيب وخا تتبدل dir د الصفحة */
+                direction: ltr !important;
             }
             @media (max-width: 600px) {
                 .lang-container { right: 20px; }
             }
 
             .lang-link {
-                color: var(--text-muted); /* البنفسجي العادي */
+                color: var(--text-muted);
                 text-decoration: none;
                 font-weight: bold;
                 font-size: 15px;
@@ -71,7 +78,6 @@ def index():
                 display: inline-block;
             }
             
-            /* الستايل السحري فاش كتشعل اللغة النشطة ترجع بيضاء تماماً */
             .lang-link.active {
                 color: #ffffff !important;
                 text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
@@ -248,7 +254,6 @@ def index():
             };
 
             function setLanguage(lang) {
-                // 1. تبديل كلاس الـ active لتغيير الألوان (الأبيض للنشط والبنفسجي للخافت)
                 if (lang === 'ar') {
                     document.getElementById('langAr').classList.add('active');
                     document.getElementById('langEn').classList.remove('active');
@@ -257,7 +262,6 @@ def index():
                     document.getElementById('langAr').classList.remove('active');
                 }
                 
-                // 2. تحديث نصوص الصفحة كاملة بنقاء
                 const t = translations[lang];
                 document.getElementById('htmlTag').setAttribute('dir', t.dir);
                 document.getElementById('mainTitle').innerHTML = t.title;
@@ -276,7 +280,6 @@ def index():
                 const downloadLink = document.getElementById('downloadLink');
                 const videoTitle = document.getElementById('videoTitle');
                 
-                // جلب اتجاه اللغة الحالية لمعرفة التنبيهات
                 const isAr = document.getElementById('langAr').classList.contains('active');
                 const t = isAr ? translations['ar'] : translations['en'];
                 
@@ -315,11 +318,12 @@ def index():
 def download():
     data = request.get_json()
     video_url = data.get('url')
-    if not video_url or ("facebook.com" not in video_url and "fb.watch" not in video_url):
+    # دعم كل صيغ روابط الفيسبوك المختلفة بما فيها الروابط المختصرة د الهواتف (m.facebook, fb.watch, fb.gg)
+    if not video_url or not any(x in video_url for x in ["facebook.com", "fb.watch", "fb.gg"]):
         return jsonify({"success": False, "error": "رابط غير صحيح"})
         
     result = get_facebook_video_url(video_url)
     return jsonify(result)
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True)
