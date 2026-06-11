@@ -1,2 +1,2 @@
-Flask
-gunicornpython app.py
+flask
+gunicorn
